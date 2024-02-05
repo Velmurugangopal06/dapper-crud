@@ -1,7 +1,19 @@
+using Dapper.CRUD.Helpers;
+using Dapper.CRUD.Endpoints;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("DefaultConnection") ?? 
+        throw new ApplicationException("The connection string is not passed");
+
+    return new SqlConnectionFactory(connectionString);
+});
 
 var app = builder.Build();
 
@@ -12,4 +24,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapCustomerEndpoints();
+
 app.Run();
