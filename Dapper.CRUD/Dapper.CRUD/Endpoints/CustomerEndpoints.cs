@@ -16,6 +16,26 @@ namespace Dapper.CRUD.Endpoints
 
                 return Results.Ok(result);
             });
+
+            builder.MapGet("customers/{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            {
+                using var connection = sqlConnectionFactory.Create();
+
+                var sql = "SELECT Id, FirstName, LastName, Email, DateOfBirth FROM Customer WHERE Id = @Id";
+                var result = await connection.QueryFirstOrDefaultAsync<Customer>(sql, new { Id = id });
+
+                return result != null ? Results.Ok(result): Results.NotFound();
+            });
+
+            builder.MapPost("customers", async (Customer customer, SqlConnectionFactory sqlConnectionFactory) =>
+            {
+                using var connection = sqlConnectionFactory.Create();
+
+                var sql = "INSERT INTO Customer (Id, FirstName, LastName, Email, DateOfBirth) VALUES (@Id, @FirstName, @LastName, @Email, @DateOfBirth)";
+                var result = await connection.ExecuteAsync(sql, customer);
+
+                return Results.Ok();
+            });
         }
     }
 }
