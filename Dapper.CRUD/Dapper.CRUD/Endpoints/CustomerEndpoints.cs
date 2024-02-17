@@ -20,7 +20,7 @@ namespace Dapper.CRUD.Endpoints
             builder.MapGet("customers/{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
-
+  
                 var sql = "SELECT Id, FirstName, LastName, Email, DateOfBirth FROM Customer WHERE Id = @Id";
                 var result = await connection.QueryFirstOrDefaultAsync<Customer>(sql, new { Id = id });
 
@@ -35,6 +35,16 @@ namespace Dapper.CRUD.Endpoints
                 var result = await connection.ExecuteAsync(sql, customer);
 
                 return Results.Ok();
+            });
+
+            builder.MapPut("customers", async (Customer customer, SqlConnectionFactory sqlConnectionFactory) =>
+            {
+                using var connection = sqlConnectionFactory.Create();
+
+                var sql = "UPDATE Customer SET FirstName = @FirstName, LastName = @LastName, Email = @Email, DateOfBirth = @DateOfBirth WHERE Id = @Id";
+                var result = await connection.ExecuteAsync(sql, customer);
+
+                return Results.NoContent();
             });
         }
     }
