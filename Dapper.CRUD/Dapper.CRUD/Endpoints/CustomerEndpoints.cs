@@ -46,6 +46,16 @@ namespace Dapper.CRUD.Endpoints
 
                 return Results.NoContent();
             });
+
+            builder.MapDelete("customers/{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            {
+                using var connection = sqlConnectionFactory.Create();
+
+                var sql = "DELETE FROM Customer WHERE Id = @Id";
+                var result = await connection.ExecuteAsync(sql, new { Id = id });
+
+                return Results.NoContent();
+            });
         }
     }
 }
