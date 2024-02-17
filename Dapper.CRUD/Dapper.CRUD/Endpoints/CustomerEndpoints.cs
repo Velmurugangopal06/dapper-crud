@@ -49,7 +49,7 @@ namespace Dapper.CRUD.Endpoints
                 return Results.NoContent();
             });
 
-            groupBuilder.MapDelete("{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            groupBuilder.MapDelete("    ", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
 
