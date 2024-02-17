@@ -7,7 +7,9 @@ namespace Dapper.CRUD.Endpoints
     {
         public static void MapCustomerEndpoints(this IEndpointRouteBuilder builder)
         {
-            builder.MapGet("customers", async (SqlConnectionFactory sqlConnectionFactory) =>
+            var groupBuilder = builder.MapGroup("customers");
+
+            groupBuilder.MapGet("", async (SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
 
@@ -17,7 +19,7 @@ namespace Dapper.CRUD.Endpoints
                 return Results.Ok(result);
             });
 
-            builder.MapGet("customers/{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            groupBuilder.MapGet("{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
   
@@ -27,7 +29,7 @@ namespace Dapper.CRUD.Endpoints
                 return result != null ? Results.Ok(result): Results.NotFound();
             });
 
-            builder.MapPost("customers", async (Customer customer, SqlConnectionFactory sqlConnectionFactory) =>
+            groupBuilder.MapPost("", async (Customer customer, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
 
@@ -37,7 +39,7 @@ namespace Dapper.CRUD.Endpoints
                 return Results.Ok();
             });
 
-            builder.MapPut("customers", async (Customer customer, SqlConnectionFactory sqlConnectionFactory) =>
+            groupBuilder.MapPut("", async (Customer customer, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
 
@@ -47,7 +49,7 @@ namespace Dapper.CRUD.Endpoints
                 return Results.NoContent();
             });
 
-            builder.MapDelete("customers/{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            groupBuilder.MapDelete("{id}", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
 
