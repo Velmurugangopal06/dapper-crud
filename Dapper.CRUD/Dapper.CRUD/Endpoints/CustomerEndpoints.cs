@@ -1,5 +1,6 @@
 ﻿using Dapper.CRUD.Helpers;
 using Dapper.CRUD.Models;
+using Dapper.CRUD.Models.Response;
 
 namespace Dapper.CRUD.Endpoints
 {
@@ -49,7 +50,7 @@ namespace Dapper.CRUD.Endpoints
                 return Results.NoContent();
             });
 
-            groupBuilder.MapDelete("    ", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            groupBuilder.MapDelete("", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
             {
                 using var connection = sqlConnectionFactory.Create();
 
@@ -57,6 +58,36 @@ namespace Dapper.CRUD.Endpoints
                 var result = await connection.ExecuteAsync(sql, new { Id = id });
 
                 return Results.NoContent();
+            });
+
+            groupBuilder.MapGet("orders", async (int id, SqlConnectionFactory sqlConnectionFactory) =>
+            {
+                var result = new CustomerMinimizedResponse();
+                using var connection = sqlConnectionFactory.Create();
+
+                var sql = """
+                    SELECT C.Id, C.Email, O.Id AS OrderId, O.Amount, O.NumberOfProducts
+                    FROM Customer C 
+                    INNER JOIN [Order] O ON O.CustomerId = C.Id
+                    WHERE C.Id = @Id
+                """;
+                await connection.QueryAsync<CustomerMinimizedResponse, OrderMinimizedResponse, CustomerMinimizedResponse>(
+                    sql,
+                    (customer, order) =>
+                    {
+                        result = result.Email?.Length > 0 ? result: customer;
+                        if(result.Orders == null) 
+                            result.Orders = new List<OrderMinimizedResponse>();
+                        result.Orders.Add(order);
+                        return result;
+                    },
+                    new
+                    {
+                        id
+                    },
+                    splitOn: "OrderId");
+
+                return Results.Ok(result);
             });
         }
     }
